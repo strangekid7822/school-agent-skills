@@ -22,39 +22,39 @@ TEMPLATE = """\
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>{{TITLE}}</title>
+    <title>%%TITLE%%</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&display=swap');
-        @page {{ size: A4; margin: 12mm 12mm 5mm 12mm; }}
-        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-        body {{ font-family: "Noto Sans SC", "PingFang SC", sans-serif; font-size: 12pt; line-height: 1.4; background: #f5f5f5; padding: 20px; color: #333; }}
-        .page {{ max-width: 210mm; margin: 0 auto; background: #fff; padding: 25px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-        .header {{ border-bottom: 3px solid {{BORDER_COLOR}}; padding-bottom: 15px; margin-bottom: 20px; }}
-        .title-row {{ display: flex; justify-content: space-between; align-items: center; }}
-        .title-group {{ display: flex; align-items: center; gap: 15px; }}
-        .logo {{ width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid {{BORDER_COLOR}}; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }}
-        h1 {{ font-size: 18pt; font-weight: 600; color: {{TITLE_COLOR}}; letter-spacing: 1px; }}
-        .subtitle {{ font-size: 11pt; color: #64748b; margin-top: 4px; }}
-        .info-box {{ display: flex; gap: 25px; font-size: 11pt; color: #475569; }}
-        .info-box .field {{ display: flex; align-items: baseline; gap: 8px; }}
-        .info-box .underline {{ display: inline-block; width: 70px; border-bottom: 1px solid #333; vertical-align: bottom; margin-bottom: 2px; }}
-        .info-box .underline.short {{ width: 40px; }}
-        .main-table {{ width: 100%; border-collapse: collapse; font-size: 11pt; }}
-        .main-table th {{ background: {{HEADER_BG}}; color: #fff; font-weight: 500; padding: 8px 10px; text-align: left; font-size: 10pt; letter-spacing: 0.5px; }}
-        .main-table td {{ padding: 8px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }}
-        .col-num {{ width: 30px; text-align: center; font-weight: 600; color: {{NUM_COLOR}}; background: {{NUM_BG}}; }}
-        .col-zh {{ width: 30%; }}
-        .col-en {{ width: 20%; background: #fafafa; {{EN_COLOR_RULE}} }}
-        .col-spacer {{ width: 10mm; border: none !important; background: transparent !important; }}
-        .main-table tr:last-child td:not(.col-spacer) {{ border-bottom: 2px solid {{HEADER_BG}}; }}
-        @media print {{
-            body {{ background: #fff; padding: 0; }}
-            .page {{ box-shadow: none; padding: 0; padding-top: 5mm; }}
-            tr {{ page-break-inside: avoid; }}
-            table {{ page-break-inside: avoid; }}
-            .header {{ page-break-inside: avoid; page-break-after: avoid; }}
-            thead {{ display: table-header-group; }}
-        }}
+        @page { size: A4; margin: 12mm 12mm 5mm 12mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Noto Sans SC", "PingFang SC", sans-serif; font-size: 12pt; line-height: 1.4; background: #f5f5f5; padding: 20px; color: #333; }
+        .page { max-width: 210mm; margin: 0 auto; background: #fff; padding: 25px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { border-bottom: 3px solid %%BORDER_COLOR%%; padding-bottom: 15px; margin-bottom: 20px; }
+        .title-row { display: flex; justify-content: space-between; align-items: center; }
+        .title-group { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid %%BORDER_COLOR%%; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+        h1 { font-size: 18pt; font-weight: 600; color: %%TITLE_COLOR%%; letter-spacing: 1px; }
+        .subtitle { font-size: 11pt; color: #64748b; margin-top: 4px; }
+        .info-box { display: flex; gap: 25px; font-size: 11pt; color: #475569; }
+        .info-box .field { display: flex; align-items: baseline; gap: 8px; }
+        .info-box .underline { display: inline-block; width: 70px; border-bottom: 1px solid #333; vertical-align: bottom; margin-bottom: 2px; }
+        .info-box .underline.short { width: 40px; }
+        .main-table { width: 100%; border-collapse: collapse; font-size: 11pt; }
+        .main-table th { background: %%HEADER_BG%%; color: #fff; font-weight: 500; padding: 8px 10px; text-align: left; font-size: 10pt; letter-spacing: 0.5px; }
+        .main-table td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+        .col-num { width: 30px; text-align: center; font-weight: 600; color: %%NUM_COLOR%%; background: %%NUM_BG%%; }
+        .col-zh { width: 30%; }
+        .col-en { width: 20%; background: #fafafa; %%EN_COLOR_RULE%% }
+        .col-spacer { width: 10mm; border: none !important; background: transparent !important; }
+        .main-table tr:last-child td:not(.col-spacer) { border-bottom: 2px solid %%HEADER_BG%%; }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .page { box-shadow: none; padding: 0; padding-top: 5mm; }
+            tr { page-break-inside: avoid; }
+            table { page-break-inside: avoid; }
+            .header { page-break-inside: avoid; page-break-after: avoid; }
+            thead { display: table-header-group; }
+        }
     </style>
 </head>
 <body>
@@ -64,14 +64,14 @@ TEMPLATE = """\
                 <div class="title-group">
                     <img src="teacher_logo.jpg" alt="Teacher" class="logo">
                     <div>
-                        <h1>{{TITLE}}</h1>
-                        <div class="subtitle">{{SUBTITLE}}</div>
+                        <h1>%%TITLE%%</h1>
+                        <div class="subtitle">%%SUBTITLE%%</div>
                     </div>
                 </div>
                 <div class="info-box">
                     <div class="field">姓名 <span class="underline"></span></div>
                     <div class="field">班级 <span class="underline"></span></div>
-                    <div class="field">得分 <span class="underline short"></span>/{{TOTAL}}</div>
+                    <div class="field">得分 <span class="underline short"></span>/%%TOTAL%%</div>
                 </div>
             </div>
         </div>
@@ -88,7 +88,7 @@ TEMPLATE = """\
                 </tr>
             </thead>
             <tbody>
-                {{TABLE_ROWS}}
+                %%TABLE_ROWS%%
             </tbody>
         </table>
     </div>
@@ -115,26 +115,51 @@ GREEN = dict(
     EN_COLOR_RULE='color: #059669;',
 )
 
-POS_TAGS = ('n.', 'v.', 'adj.', 'adv.', 'prep.', 'conj.', 'pron.',
-            'num.', 'art.', 'int.', 'interj.', 'inter.', 'pl.')
+# Ordered longest-first so "pron." is checked before "n.", "adv." before "v.", etc.
+POS_TAGS = sorted(
+    ['n.', 'v.', 'adj.', 'adv.', 'prep.', 'conj.', 'pron.',
+     'num.', 'art.', 'int.', 'interj.', 'inter.', 'pl.'],
+    key=len, reverse=True
+)
 
 
 def clean_en(raw):
+    """Strip phonetics, POS tags, verb forms in parens, trailing &, extra spaces."""
+    # Remove phonetics /.../ and [...]
     raw = re.sub(r'/[^/]*/', '', raw)
     raw = re.sub(r'\[[^\]]*\]', '', raw)
+    # Remove trailing &
     raw = re.sub(r'\s*&\s*$', '', raw)
+    # Collapse multiple spaces into one
+    raw = re.sub(r'\s{2,}', ' ', raw)
     return raw.strip()
 
 
 def parse_entry(num, content):
+    """Return dict with num, en_clean, zh_display for one numbered line."""
+    # Find first Chinese character to split EN / ZH
     first_cn = next((i for i, c in enumerate(content)
                      if '\u4e00' <= c <= '\u9fa5'), -1)
+
     if first_cn == -1:
+        # No Chinese — proper name or English-only entry
         return {'num': num, 'en_clean': clean_en(content), 'zh_display': ''}
 
     en_raw = content[:first_cn].strip()
     zh_raw = content[first_cn:].strip()
 
+    # Strip trailing parenthetical content FIRST (before POS check),
+    # because POS may sit before parens: "v. (rang/ræŋ/，rung/rʌŋ/)"
+    # Remove all trailing (...) groups that contain no Chinese characters.
+    while True:
+        m2 = re.search(r'\s*\([^)]*\)\s*$', en_raw)
+        if m2 and not any('\u4e00' <= c <= '\u9fa5' for c in m2.group()):
+            en_raw = en_raw[:m2.start()].strip()
+        else:
+            break
+
+    # Pull trailing POS off the English fragment.
+    # Check compound POS first (e.g. "v. & n." or "n. & v.")
     pos = ''
     m = re.search(r'([nv]\.\s*[&＆]\s*[nv]\.)\s*$', en_raw)
     if m:
@@ -190,12 +215,12 @@ def build_rows(words, mode):
 def render(subtitle, total, rows, theme, title):
     html = TEMPLATE
     for key, val in theme.items():
-        html = html.replace('{{' + key + '}}', val)
+        html = html.replace('%%' + key + '%%', val)
     html = (html
-            .replace('{{TITLE}}',      title)
-            .replace('{{SUBTITLE}}',   subtitle)
-            .replace('{{TOTAL}}',      str(total))
-            .replace('{{TABLE_ROWS}}', rows))
+            .replace('%%TITLE%%',      title)
+            .replace('%%SUBTITLE%%',   subtitle)
+            .replace('%%TOTAL%%',      str(total))
+            .replace('%%TABLE_ROWS%%', rows))
     return html
 
 
