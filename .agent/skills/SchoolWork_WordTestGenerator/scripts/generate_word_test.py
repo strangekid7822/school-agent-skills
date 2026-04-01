@@ -137,9 +137,21 @@ def clean_en(raw):
 
 def parse_entry(num, content):
     """Return dict with num, en_clean, zh_display for one numbered line."""
-    # Find first Chinese character to split EN / ZH
+    # Strip leading * (marks important/bold words in source)
+    content = content.lstrip('*').lstrip()
+    # Find first Chinese character (or Chinese punctuation like 《（) to split EN / ZH
     first_cn = next((i for i, c in enumerate(content)
-                     if '\u4e00' <= c <= '\u9fa5'), -1)
+                     if '\u4e00' <= c <= '\u9fa5' or c in '《（'), -1)
+
+    # Backtrack to include digits immediately before first Chinese char
+    # e.g. "n.  13至19岁" — the "13" belongs to the Chinese meaning
+    while first_cn > 0 and content[first_cn - 1].isdigit():
+        first_cn -= 1
+
+    # Backtrack past ASCII '(' that opens a Chinese parenthetical
+    # e.g. "n.  (鱼) 鳍" — the "(" belongs to the Chinese meaning
+    if first_cn > 0 and content[first_cn - 1] == '(':
+        first_cn -= 1
 
     if first_cn == -1:
         # No Chinese — proper name or English-only entry
@@ -159,9 +171,10 @@ def parse_entry(num, content):
             break
 
     # Pull trailing POS off the English fragment.
-    # Check compound POS first (e.g. "v. & n." or "n. & v.")
+    # Check compound POS first (e.g. "v. & n.", "adj. & adv.")
     pos = ''
-    m = re.search(r'([nv]\.\s*[&＆]\s*[nv]\.)\s*$', en_raw)
+    _pos_alt = r'(?:adj|adv|prep|conj|pron|interj|inter|num|art|int|pl|[nv])\.'
+    m = re.search(rf'({_pos_alt}\s*[&＆]\s*{_pos_alt})\s*$', en_raw)
     if m:
         pos = m.group(1)
         en_raw = en_raw[:m.start()].strip()
@@ -183,6 +196,9 @@ def parse_file(filepath):
             line = line.strip()
             if not line or line.startswith('=') or line.startswith('-'):
                 continue
+            # Stop at proper noun section (地名/人名)
+            if '地名' in line or '人名' in line:
+                break
             m = re.match(r'^(\d+)\.\s+(.*)', line)
             if m:
                 words.append(parse_entry(m.group(1), m.group(2)))
