@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+@page { size: A4; margin: 12mm 14mm; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    font-size: 10.5pt;
+    color: #1a1a1a;
+    background: #fff;
+    line-height: 1.65;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.page {
+    width: 100%;
+}
+
+/* ── Document Header ── */
+.doc-header {
+    border-bottom: 2.5px solid #111;
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+}
+.doc-header-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.doc-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1.5px solid #ddd;
+}
+.doc-title {
+    font-size: 14.5pt;
+    font-weight: 800;
+    color: #111;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+}
+.doc-subtitle {
+    font-size: 8.5pt;
+    color: #888;
+    margin-top: 3px;
+    letter-spacing: 0.12em;
+}
+
+/* ── Section ── */
+.section {
+    margin-bottom: 13px;
+}
+.section-label {
+    font-size: 7pt;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #999;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+}
+
+/* ── Passage ── */
+.passage-title {
+    font-size: 12.5pt;
+    font-weight: 700;
+    color: #111;
+    text-align: center;
+    margin-bottom: 11px;
+    font-family: Georgia, 'Times New Roman', serif;
+    letter-spacing: 0.01em;
+}
+.passage-para {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10pt;
+    color: #222;
+    line-height: 1.7;
+    text-indent: 2em;
+    margin-bottom: 5px;
+}
+.blank {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10pt;
+    color: #444;
+    letter-spacing: -0.02em;
+}
+.blank-inner {
+    font-weight: 700;
+    color: #111;
+    letter-spacing: 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 9.5pt;
+}
+.passage-underline {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.passage-bold {
+    font-weight: 700;
+    color: #111;
+}
+
+/* ── Reading Comprehension Questions ── */
+.reading-question {
+    margin-bottom: 11px;
+    page-break-inside: avoid;
+}
+.reading-q-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10.5pt;
+    color: #111;
+    line-height: 1.65;
+    margin-bottom: 5px;
+}
+.reading-q-num {
+    font-weight: 700;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+}
+.reading-opts-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+/* one-row layout: cells share width equally, no wrapping */
+.reading-opts-table.one-row .reading-opt-cell {
+    padding: 2px 12px 2px 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10pt;
+    color: #333;
+    vertical-align: top;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+/* per-line layout: each option occupies the full width */
+.reading-opts-table.per-line .reading-opt-cell {
+    width: 100%;
+    display: block;
+    padding: 1px 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10pt;
+    color: #333;
+    line-height: 1.6;
+}
+.reading-opt-letter {
+    font-weight: 700;
+    color: #111;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 9.5pt;
+    margin-right: 2px;
+}
+
+/* ── Options (single-column box — for 七选五) ── */
+.options-box {
+    border: 1.5px solid #c8c8c8;
+    border-radius: 3px;
+    padding: 4px 14px;
+    background: #fafafa;
+}
+.option-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px dotted #e0e0e0;
+}
+.option-item:last-child {
+    border-bottom: none;
+    padding-bottom: 1px;
+}
+.option-letter {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #111;
+    flex-shrink: 0;
+    width: 20px;
+    padding-top: 1px;
+}
+.option-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10pt;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ── Translation Practice (question side) ── */
+.trans-practice-item {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dotted #ddd;
+}
+.trans-practice-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+.trans-practice-prompt {
+    font-size: 9pt;
+    color: #666;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+}
+.trans-practice-en {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 10.5pt;
+    color: #111;
+    line-height: 1.8;
+    margin-bottom: 10px;
+    padding-left: 4px;
+}
+.write-line {
+    border-bottom: 1px solid #bbb;
+    height: 24px;
+    margin-bottom: 4px;
+}
+
+/* ── Answer Section Divider ── */
+.answer-divider {
+    page-break-before: always;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 4mm;
+    margin-bottom: 16px;
+}
+.answer-divider-line {
+    flex: 1;
+    height: 1.5px;
+    background: #111;
+}
+.answer-divider-text {
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    color: #333;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+/* ── Answers ── */
+.answers-container {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+.answer-entry {
+    background: #f7f7f7;
+    border-left: 3px solid #b0b0b0;
+    padding: 8px 11px;
+}
+.answer-header {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+.answer-num {
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: #aaa;
+    flex-shrink: 0;
+    min-width: 22px;
+}
+.answer-letter-big {
+    font-size: 14pt;
+    font-weight: 900;
+    color: #111;
+    flex-shrink: 0;
+    line-height: 1;
+    min-width: 18px;
+}
+.answer-word {
+    font-size: 11pt;
+    font-weight: 700;
+    font-style: italic;
+    color: #111;
+    flex-shrink: 0;
+}
+.answer-note {
+    font-size: 8pt;
+    color: #999;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+}
+.answer-jiexi {
+    font-size: 9.5pt;
+    color: #444;
+    line-height: 1.65;
+    padding-left: 47px;
+}
+.answer-extra {
+    margin-top: 6px;
+    padding: 6px 9px;
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+    font-size: 9pt;
+    color: #555;
+    line-height: 1.6;
+}
+.extra-line { margin-bottom: 2px; }
+.tag-label { font-weight: 700; color: #666; }
+
+/* ── Vocabulary ── */
+.vocab-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px 18px;
+}
+.vocab-item {
+    font-size: 9.5pt;
+    padding: 3px 0;
+    border-bottom: 1px solid #f0f0f0;
+    line-height: 1.5;
+}
+.vocab-en { font-weight: 600; color: #111; }
+.vocab-sep { color: #bbb; margin: 0 3px; }
+.vocab-cn { color: #666; font-size: 9pt; }
+
+/* ── Translation (answer side) ── */
+.trans-block { margin-bottom: 13px; }
+.trans-en {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 10pt;
+    color: #222;
+    line-height: 1.75;
+    margin-bottom: 4px;
+}
+.trans-cn {
+    font-size: 10pt;
+    color: #333;
+    font-style: italic;
+    display: inline-block;
+    border-bottom: 1.5px solid #555;
+    padding-bottom: 2px;
+    line-height: 1.8;
+}
+
+/* ── Vocab Practice (question side) ── */
+.vocab-practice-prompt {
+    font-size: 9pt;
+    color: #666;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+}
+.vocab-practice-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 20px;
+}
+.vocab-practice-item {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    padding: 5px 0 2px;
+    border-bottom: 1px solid #ccc;
+}
+.vocab-practice-word {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 10pt;
+    color: #111;
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+.vocab-practice-fill { flex: 1; }
+
+/* ── Cloze Options Grid (完形填空) ── */
+.cloze-options-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10pt;
+}
+.cloze-option-row td {
+    padding: 2.5px 10px 2.5px 0;
+    vertical-align: top;
+    line-height: 1.55;
+    color: #222;
+}
+.cloze-q-num {
+    font-weight: 700;
+    color: #444;
+    font-size: 9pt;
+    white-space: nowrap;
+    width: 26px;
+    padding-left: 0;
+}
+.cloze-opt-label {
+    font-weight: 700;
+    color: #111;
+    margin-right: 3px;
+}
+.cloze-opt-cell {
+    /* no fixed width — browser distributes evenly */
+}
+
+/* ── Generic ── */
+.generic-para {
+    font-size: 10pt;
+    color: #333;
+    line-height: 1.65;
+    margin-bottom: 6px;
+}
+
+@media print {
+    body { background: #fff; }
+    .answer-entry { page-break-inside: avoid; }
+    .trans-practice-item { page-break-inside: avoid; }
+    .cloze-option-row { page-break-inside: avoid; }
+    .reading-question { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="doc-header"><div class="doc-header-row"><img src="file:///Users/zhaoqiang/Library/CloudStorage/OneDrive-Personal/School/教学部门/08_初高中资料/.agent/skills/SchoolWork_WordTestGenerator/resources/teacher_logo.jpg" class="doc-logo" alt=""><div class="doc-text"><div class="doc-title">example</div><div class="doc-subtitle">output  ·  yuedulijie</div></div></div></div>
+<section class="section"><p class="passage-para">Microplastics have become a common source of pollution across the Earth—they have settled in the deep sea and on the Himalayas, stuck inside volcanic rocks, filled the stomachs of seabirds and even fallen in fresh Antarctic snow. They are even appearing inside humans.</p><p class="passage-para">Now, new research suggests that a simple, cheap measure may significantly reduce the level of microplastics in water from your tap(水龙头); boiling and filtering(过滤) it. In a study published Wednesday in Environmental Science &amp; Technology Letters, researchers from China found that boiling tap water for just five minutes—then filtering it after it cools—could remove at least 80 percent of its microplastics.</p><p class="passage-para">Crucially, this process relies on the water containing enough calcium carbonate(碳酸钙) to trap the plastics. In the study, boiling hard water containing 300 milligrams of calcium carbonate led to an almost 90 percent drop in plastics. But in samples with less than 60 milligrams of calcium carbonate, boiling reduced the level of plastics by just 25 percent. Additionally, the research didn&#x27;t include all types of plastics. The team focused only on three common types—polystyrene, polyethylene and polypropylene—and they didn&#x27;t study other chemicals previously found in water such as vinyl chloride.</p><p class="passage-para">Still, the findings show a potential path forward for reducing microplastic exposure—a task that&#x27;s becoming increasingly difficult. Even bottled water, scientists found earlier this year, contains 10 to 1 000 times more microplastics than originally thought.</p><p class="passage-para">Scientists are still trying to determine how harmful microplastics are—but what they do know has raised concerns. The new study suggests boiling tap water could be a tool to limit intake. &quot;The way they demonstrated how microplastics were trapped through the boiling process was nice,&quot; Caroline Gauchotte-Lindsay, an environmental engineer at the University of Glasgow in Scotland who was not involved in the research, tells New Scientist. &quot;We should be looking into upgrading drinking water treatment plants so they remove microplastics.&quot;</p></section>
+<section class="section"><div class="reading-question"><div class="reading-q-text"><span class="reading-q-num">32.</span> How does the author present the issue in the first paragraph?</div><table class="reading-opts-table per-line"><tr><td class="reading-opt-cell"><span class="reading-opt-letter">A.</span>By quoting an expert.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">B.</span>By defining a concept.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">C.</span>By giving examples.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">D.</span>By providing statistics.</td></tr></table></div><div class="reading-question"><div class="reading-q-text"><span class="reading-q-num">33.</span> What determines the effectiveness of trapping microplastics in water?</div><table class="reading-opts-table per-line"><tr><td class="reading-opt-cell"><span class="reading-opt-letter">A.</span>The hardness of water.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">B.</span>The length of cooling time.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">C.</span>The frequency of filtering.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">D.</span>The type of plastic in water.</td></tr></table></div><div class="reading-question"><div class="reading-q-text"><span class="reading-q-num">34.</span> What does the author try to illustrate by mentioning bottled water in Paragraph 4?</div><table class="reading-opts-table per-line"><tr><td class="reading-opt-cell"><span class="reading-opt-letter">A.</span>The importance of plastic recycling.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">B.</span>The severity of the microplastic problem.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">C.</span>The danger in overusing pure water.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">D.</span>The difficulty in treating polluted water.</td></tr></table></div><div class="reading-question"><div class="reading-q-text"><span class="reading-q-num">35.</span> What is Gauchotte-Lindsay&#x27;s suggestion about?</div><table class="reading-opts-table per-line"><tr><td class="reading-opt-cell"><span class="reading-opt-letter">A.</span>Choice of new research methods.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">B.</span>Possible direction for further study.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">C.</span>Need to involve more researchers.</td></tr><tr><td class="reading-opt-cell"><span class="reading-opt-letter">D.</span>Potential application of the findings.</td></tr></table></div></section>
+<section class="section"><div class="section-label">写出下列单词的汉语意思：</div><div class="vocab-practice-grid"><div class="vocab-practice-item"><span class="vocab-practice-word">pollution</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">settle</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">significantly</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">measure</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">reduce</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">filter</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">rely on</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">trap</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">potential</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">exposure</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">determine</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">concern</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">intake</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">demonstrate</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">focus on</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">lead to</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">severity</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">illustrate</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">effectiveness</span><span class="vocab-practice-fill"></span></div><div class="vocab-practice-item"><span class="vocab-practice-word">previously</span><span class="vocab-practice-fill"></span></div></div></section>
+<section class="section"><div class="section-label">请写出下面这句话的翻译：</div><div class="trans-practice-item"><div class="trans-practice-en">&quot;The way they demonstrated how microplastics were trapped through the boiling process was nice,&quot; Caroline Gauchotte-Lindsay, an environmental engineer at the University of Glasgow in Scotland who was not involved in the research, tells New Scientist.</div><div class="write-line"></div></div></section>
+<div class="answer-divider">
+  <div class="answer-divider-line"></div>
+  <div class="answer-divider-text">参 考 答 案</div>
+  <div class="answer-divider-line"></div>
+</div>
+<section class="section"><div class="section-label">阅读理解D·答案解析</div><div class="answers-container"><div class="answer-entry"><div class="answer-header"><span class="answer-num">32.</span><span class="answer-letter-big">C</span><span class="answer-note">写作手法题</span></div><div class="answer-jiexi">第一段通过列举微塑料存在于深海、喜马拉雅山脉、火山岩、海鸟的胃部、南极洲的新鲜积雪中、人体内部这些例子说明了微塑料污染的广泛性。由此可知，作者在第一段中运用了举例的写作手法来呈现微塑料污染普遍存在这一问题。故选C。</div></div><div class="answer-entry"><div class="answer-header"><span class="answer-num">33.</span><span class="answer-letter-big">A</span><span class="answer-note">细节理解题</span></div><div class="answer-jiexi">该题问的是什么决定了减少水中微塑料含量的效果。根据第三段内容尤其是第一句&quot;Crucially, this process relies on the water containing enough calcium carbonate(碳酸钙) to trap the plastics.&quot;可知，关键在于，这一过程依赖于水中含有足够多的碳酸钙来吸附微塑料。将含有300毫克碳酸钙的硬水煮沸后，水中的微塑料含量几乎减少了90%，但在碳酸钙含量低于60毫克的水样中，煮沸只能减少水中约25%的微塑料含量。由此可知，碳酸钙含量，即水质硬度是决定减少水中微塑料含量的关键因素。故选A。</div></div><div class="answer-entry"><div class="answer-header"><span class="answer-num">34.</span><span class="answer-letter-big">B</span><span class="answer-note">推理判断题 【定位句】Even bottled water, scientists found earlier this year, contains 10 to 1 000 times more microplastics than originally thought.（第四段最后一句）</span></div><div class="answer-extra"><div class="extra-line">译文 科学家在今年早些时候发现，甚至瓶装水中的微塑料含量也比原先认为的高出10到1000倍。</div><div class="extra-line"><span class="tag-label">【解析】</span>该题问的是作者在第四段提到瓶装水是为了说明什么。作者提到瓶装水中的微塑料含量超出预期是为了说明微塑料污染无处不在，以此强调微塑料问题的严重性。故选B。</div></div></div><div class="answer-entry"><div class="answer-header"><span class="answer-num">35.</span><span class="answer-letter-big">D</span><span class="answer-note">推理判断题 【定位句】&quot;We should be looking into upgrading drinking water treatment plants so they remove microplastics.&quot;（第五段最后一句）</span></div><div class="answer-extra"><div class="extra-line">译文 &quot;我们应该（进一步）研究升级饮用水处理厂，以便它们能够去除（饮用水中的）微塑料。&quot;</div><div class="extra-line"><span class="tag-label">【解析】</span>根据第五段尤其是定位句可知，Gauchotte-Lindsay建议将&quot;用煮沸过滤法去除微塑料&quot;的技术应用于饮用水处理厂升级。这属于将研究成果转化为实际应用的建议。D项&quot;研究发现的潜在应用&quot;符合题意。故选D。</div></div></div></div></section>
+<section class="section"><div class="section-label">阅读理解D·重点词汇</div><div class="vocab-grid"><div class="vocab-item"><span class="vocab-en">pollution</span><span class="vocab-sep">—</span><span class="vocab-cn">n. 污染</span></div><div class="vocab-item"><span class="vocab-en">settle</span><span class="vocab-sep">—</span><span class="vocab-cn">v. （使）沉降；（常用义）定居，解决</span></div><div class="vocab-item"><span class="vocab-en">significantly</span><span class="vocab-sep">—</span><span class="vocab-cn">adv. 显著地，大量地</span></div><div class="vocab-item"><span class="vocab-en">measure</span><span class="vocab-sep">—</span><span class="vocab-cn">n. 措施，方法</span></div><div class="vocab-item"><span class="vocab-en">reduce</span><span class="vocab-sep">—</span><span class="vocab-cn">v. 减少，降低</span></div><div class="vocab-item"><span class="vocab-en">filter</span><span class="vocab-sep">—</span><span class="vocab-cn">v. 过滤；n. 过滤器</span></div><div class="vocab-item">rely on - 依赖于，依靠</div><div class="vocab-item"><span class="vocab-en">trap</span><span class="vocab-sep">—</span><span class="vocab-cn">v. 截留，使陷入；n. 陷阱</span></div><div class="vocab-item"><span class="vocab-en">potential</span><span class="vocab-sep">—</span><span class="vocab-cn">adj. 潜在的；n. 潜力</span></div><div class="vocab-item"><span class="vocab-en">exposure</span><span class="vocab-sep">—</span><span class="vocab-cn">n. 暴露，接触</span></div><div class="vocab-item"><span class="vocab-en">determine</span><span class="vocab-sep">—</span><span class="vocab-cn">v. 确定；决定</span></div><div class="vocab-item"><span class="vocab-en">concern</span><span class="vocab-sep">—</span><span class="vocab-cn">n. 担忧，关切；v. 使担忧</span></div><div class="vocab-item"><span class="vocab-en">intake</span><span class="vocab-sep">—</span><span class="vocab-cn">n. 摄入量，吸入量</span></div><div class="vocab-item"><span class="vocab-en">demonstrate</span><span class="vocab-sep">—</span><span class="vocab-cn">v. 展示；证明；示范</span></div><div class="vocab-item">focus on - 专注于，集中于</div><div class="vocab-item">lead to - 导致，引起</div><div class="vocab-item"><span class="vocab-en">severity</span><span class="vocab-sep">—</span><span class="vocab-cn">n. 严重性，严峻性</span></div><div class="vocab-item"><span class="vocab-en">illustrate</span><span class="vocab-sep">—</span><span class="vocab-cn">v. 说明，阐明</span></div><div class="vocab-item"><span class="vocab-en">effectiveness</span><span class="vocab-sep">—</span><span class="vocab-cn">n. 有效性，效力</span></div><div class="vocab-item"><span class="vocab-en">previously</span><span class="vocab-sep">—</span><span class="vocab-cn">adv. 以前，先前</span></div></div></section>
+<section class="section"><div class="section-label">阅读理解D·难句翻译答案</div><div class="trans-block"><div class="trans-en">&quot;The way they demonstrated how microplastics were trapped through the boiling process was nice,&quot; Caroline Gauchotte-Lindsay, an environmental engineer at the University of Glasgow in Scotland who was not involved in the research, tells New Scientist.</div><div class="trans-cn">未参与该研究的苏格兰格拉斯哥大学环境工程师Caroline Gauchotte-Lindsay告诉《新科学家》：&quot;他们展示的微塑料（含量）如何通过煮沸过程而减少的方式很好。&quot;</div></div></section>
+</div>
+</body>
+</html>

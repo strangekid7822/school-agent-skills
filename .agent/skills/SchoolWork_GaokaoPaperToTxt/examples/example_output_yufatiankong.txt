@@ -1,0 +1,58 @@
+2026_五年高考真题汇编_2025全国1卷_语法填空
+========================================
+
+【语法填空·习题】
+
+An exhibition at the Jiushi Art Museum in Shanghai is featuring artwork inspired by Go, or weiqi in Chinese, ___56___ originated in China more than 4 000 years ago.
+Go is one of ___57___ earliest binary-based (基于二元的) games. The movements of the black and white pieces reflect the basic ideas of Eastern philosophy, according to Tu Ningning, who is in charge of the exhibition.
+"The exhibition brings together Go culture, cutting-edge technology and contemporary art," says Tu. "We hope ___58___ (present) the rather abstract Go game and AI in a visual context, and initiate dialogues with minimalist art, conceptual art and expressionism."
+"In a Go game, each move should serve a long term goal. You try to lead the opponent into your trap and force them to follow your '___59___ (guide)' till they lose," explains Wang Wei, a Go player among the visitors to the exhibition.
+"The players' personalities ___60___ (reveal) during the game, and one's weaknesses are exposed to the opponent," she adds. "A decent winner always ___61___ (try) to beat the opponent ___62___ no more than one or two points as a gesture (姿态) of respect for the other side."
+Tu says that the balance between the black and white pieces, the beauty in the ___63___ (strategy) placement of the pieces, ___64___ the energy flow following each move inspired artists to create oil paintings, sculptures, ___65___ (digital) generated pictures and silk-screen prints for the exhibition.
+
+【语法填空·答案解析】
+
+56.which  考查定语从句 【解析】分析句子结构可知，空格处引导非限制性定语从句，先行词是Go，指物，关系词在从句中作主语，应用关系代词which引导该从句。故填which。
+57.the  考查冠词 【解析】此处表示围棋是最早的基于二元的游戏之一。形容词最高级earliest前应用定冠词the。故填the。
+58.to present  考查非谓语动词 【解析】hope to do sth.为固定搭配，意为"希望做某事"。故填to present。
+59.guidance  考查词性转换和名词的单复数 【解析】分析句子结构可知，形容词性物主代词your后应用名词。此处指围棋对弈中的策略性引导行为，应用不可数名词guidance。故填guidance。
+【知识点拨】guide作名词时，强调具体的"指导工具或人"如：a travel guide（旅游指南）、a tour guide（导游）。guidance作名词时，强调抽象的"指导行为"或"指导过程"，通常指向建议、方向或支持。
+60.are revealed  考查动词的时态、语态和主谓一致 【解析】根据下文中的and和are exposed to可知，此处and连接并列句，陈述一般性的客观情况，应用一般现在时；主语The players' personalities与动词reveal之间是被动关系，应用被动语态；主语The players' personalities为复数，be动词应用are。故填are revealed。
+61.tries  考查动词的时态和主谓一致 【解析】根据时间状语always及语境可知，此处陈述一般性的客观情况，时态应用一般现在时；主语A decent winner为第三人称单数，谓语动词应用第三人称单数形式。故填tries。
+62.by  考查介词 【解析】此处表示以不超过一两分的优势战胜对手。by（表示数量、程度等）以……之差。故填by。
+63.strategic(al)  考查词性转换 【解析】分析句子结构可知，此处应用形容词修饰名词placement。strategy的形容词形式为strategic(al)。故填strategic(al)。
+64.and  考查连词 【解析】分析句子结构可知，"黑白棋子之间的制衡""棋子战略布局中的美感"和"每一步落子间流动的气韵"为that引导的宾语从句中的并列主语，应用连词and连接。故填and。
+65.digitally  考查词性转换 【解析】分析句子结构可知，此处应用副词修饰动词generated，表示数字生成的图像和丝网印刷品。digital的副词形式为digitally。故填digitally。
+
+【语法填空·重点词汇】
+
+exhibition - n. 展览，展出
+artwork - n. 艺术品
+originate - v. 起源，发源
+philosophy - n. 哲学
+contemporary - adj. 当代的
+context - n. 上下文，语境，背景
+expressionism - n. 表现主义
+reveal - v. 揭示，展现
+expose - v. 暴露，揭露
+balance - n. 平衡
+sculpture - n. 雕像，雕塑
+generate - v. 产生，生成
+feature - v. 以...为特色；n. 特色，特征
+inspire - v. 启发，激发
+reflect - v. 反映，反射
+cutting-edge - adj. 尖端的，前沿的
+abstract - adj. 抽象的
+conceptual - adj. 概念的
+opponent - n. 对手，竞争者
+personality - n. 个性，性格
+decent - adj. 得体的，相当好的，体面的
+respect - n./v. 尊敬，尊重
+digital - adj. 数字的
+
+【语法填空·难句翻译】
+
+The movements of the black and white pieces reflect the basic ideas of Eastern philosophy, according to Tu Ningning, who is in charge of the exhibition.
+据策展人屠宁宁介绍，黑白棋子的移动反映了东方哲学的基本思想。
+
+========================================

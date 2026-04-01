@@ -1,0 +1,11 @@
+{
+  "name": "test-paper-generator",
+  "version": "1.0.0",
+  "description": "HTML to PDF converter for TestPaperGenerator skill",
+  "scripts": {
+    "setup": "npm install puppeteer"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0"
+  }
+}

@@ -1,0 +1,46 @@
+{
+    "textbooks": [
+        {
+            "source_file": "人教版七年级上册",
+            "vocabulary": [
+                {
+                    "unit": "Starter Unit 1",
+                    "word": "unit",
+                    "phonetic": "/ˈjuːnɪt/",
+                    "part_of_speech": "n.",
+                    "meaning": "单元",
+                    "false_meanings": [
+                        "句子",
+                        "文章",
+                        "作业"
+                    ]
+                },
+                {
+                    "unit": "Starter Unit 1",
+                    "word": "conversation",
+                    "phonetic": "/ˌkɒnvəˈseɪʃn/",
+                    "part_of_speech": "n.",
+                    "meaning": "交谈",
+                    "false_meanings": [
+                        "歌曲",
+                        "故事",
+                        "电影"
+                    ]
+                },
+                {
+                    "unit": "Unit 1",
+                    "word": "make friends",
+                    "phonetic": "",
+                    "part_of_speech": "v.",
+                    "meaning": "交朋友",
+                    "false_meanings": [
+                        "做作业",
+                        "吃早餐",
+                        "看电视"
+                    ],
+                    "is_phrase": true
+                }
+            ]
+        }
+    ]
+}
