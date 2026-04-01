@@ -13,51 +13,129 @@ import shutil
 import subprocess
 import argparse
 
-SKILL_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TEMPLATE    = os.path.join(SKILL_DIR, 'resources', 'template.html')
-LOGO_SRC    = os.path.join(SKILL_DIR, 'resources', 'teacher_logo.jpg')
-PDF_SCRIPT  = os.path.join(SKILL_DIR, 'scripts', 'html_to_pdf.js')
+SKILL_DIR  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOGO_SRC   = os.path.join(SKILL_DIR, 'resources', 'teacher_logo.jpg')
+PDF_SCRIPT = os.path.join(SKILL_DIR, 'scripts', 'html_to_pdf.js')
 
-# CSS injected before </style> to turn the template green for answer files
-ANSWER_THEME = """
-        /* Answer key — green theme */
-        .header          { border-bottom-color: #10b981 !important; }
-        .logo            { border-color: #10b981 !important; }
-        h1               { color: #064e3b !important; }
-        .main-table th   { background: #064e3b !important; }
-        .col-num         { color: #10b981 !important; background: #f0fdf4 !important; }
-        .col-en          { color: #059669 !important; }
-        .main-table tr:last-child td:not(.col-spacer) { border-bottom-color: #064e3b !important; }
-"""
+TEMPLATE = """\
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{{TITLE}}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&display=swap');
+        @page {{ size: A4; margin: 12mm 12mm 5mm 12mm; }}
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        body {{ font-family: "Noto Sans SC", "PingFang SC", sans-serif; font-size: 12pt; line-height: 1.4; background: #f5f5f5; padding: 20px; color: #333; }}
+        .page {{ max-width: 210mm; margin: 0 auto; background: #fff; padding: 25px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        .header {{ border-bottom: 3px solid {{BORDER_COLOR}}; padding-bottom: 15px; margin-bottom: 20px; }}
+        .title-row {{ display: flex; justify-content: space-between; align-items: center; }}
+        .title-group {{ display: flex; align-items: center; gap: 15px; }}
+        .logo {{ width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid {{BORDER_COLOR}}; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }}
+        h1 {{ font-size: 18pt; font-weight: 600; color: {{TITLE_COLOR}}; letter-spacing: 1px; }}
+        .subtitle {{ font-size: 11pt; color: #64748b; margin-top: 4px; }}
+        .info-box {{ display: flex; gap: 25px; font-size: 11pt; color: #475569; }}
+        .info-box .field {{ display: flex; align-items: baseline; gap: 8px; }}
+        .info-box .underline {{ display: inline-block; width: 70px; border-bottom: 1px solid #333; vertical-align: bottom; margin-bottom: 2px; }}
+        .info-box .underline.short {{ width: 40px; }}
+        .main-table {{ width: 100%; border-collapse: collapse; font-size: 11pt; }}
+        .main-table th {{ background: {{HEADER_BG}}; color: #fff; font-weight: 500; padding: 8px 10px; text-align: left; font-size: 10pt; letter-spacing: 0.5px; }}
+        .main-table td {{ padding: 8px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }}
+        .col-num {{ width: 30px; text-align: center; font-weight: 600; color: {{NUM_COLOR}}; background: {{NUM_BG}}; }}
+        .col-zh {{ width: 30%; }}
+        .col-en {{ width: 20%; background: #fafafa; {{EN_COLOR_RULE}} }}
+        .col-spacer {{ width: 10mm; border: none !important; background: transparent !important; }}
+        .main-table tr:last-child td:not(.col-spacer) {{ border-bottom: 2px solid {{HEADER_BG}}; }}
+        @media print {{
+            body {{ background: #fff; padding: 0; }}
+            .page {{ box-shadow: none; padding: 0; padding-top: 5mm; }}
+            tr {{ page-break-inside: avoid; }}
+            table {{ page-break-inside: avoid; }}
+            .header {{ page-break-inside: avoid; page-break-after: avoid; }}
+            thead {{ display: table-header-group; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <div class="title-row">
+                <div class="title-group">
+                    <img src="teacher_logo.jpg" alt="Teacher" class="logo">
+                    <div>
+                        <h1>{{TITLE}}</h1>
+                        <div class="subtitle">{{SUBTITLE}}</div>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <div class="field">姓名 <span class="underline"></span></div>
+                    <div class="field">班级 <span class="underline"></span></div>
+                    <div class="field">得分 <span class="underline short"></span>/{{TOTAL}}</div>
+                </div>
+            </div>
+        </div>
+        <table class="main-table">
+            <thead>
+                <tr>
+                    <th class="col-num">#</th>
+                    <th class="col-zh">中文</th>
+                    <th class="col-en">英文</th>
+                    <th class="col-spacer"></th>
+                    <th class="col-num">#</th>
+                    <th class="col-zh">中文</th>
+                    <th class="col-en">英文</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{TABLE_ROWS}}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>"""
+
+# Blue theme (test)
+BLUE = dict(
+    BORDER_COLOR='#2563eb',
+    TITLE_COLOR='#1e3a5f',
+    HEADER_BG='#1e3a5f',
+    NUM_COLOR='#2563eb',
+    NUM_BG='#f8fafc',
+    EN_COLOR_RULE='',
+)
+
+# Green theme (answer)
+GREEN = dict(
+    BORDER_COLOR='#10b981',
+    TITLE_COLOR='#064e3b',
+    HEADER_BG='#064e3b',
+    NUM_COLOR='#10b981',
+    NUM_BG='#f0fdf4',
+    EN_COLOR_RULE='color: #059669;',
+)
 
 POS_TAGS = ('n.', 'v.', 'adj.', 'adv.', 'prep.', 'conj.', 'pron.',
             'num.', 'art.', 'int.', 'interj.', 'inter.', 'pl.')
 
 
 def clean_en(raw):
-    """Strip phonetics, POS tags, and trailing & from an English fragment."""
-    raw = re.sub(r'/[^/]*/', '', raw)      # /phonetics/
-    raw = re.sub(r'\[[^\]]*\]', '', raw)   # [phonetics]
-    raw = re.sub(r'\s*&\s*$', '', raw)     # trailing &
+    raw = re.sub(r'/[^/]*/', '', raw)
+    raw = re.sub(r'\[[^\]]*\]', '', raw)
+    raw = re.sub(r'\s*&\s*$', '', raw)
     return raw.strip()
 
 
 def parse_entry(num, content):
-    """Return dict with num, en_clean, zh_display for one numbered line."""
-    # Find first Chinese character to split EN / ZH
     first_cn = next((i for i, c in enumerate(content)
                      if '\u4e00' <= c <= '\u9fa5'), -1)
-
     if first_cn == -1:
-        # No Chinese — proper name or English-only entry
         return {'num': num, 'en_clean': clean_en(content), 'zh_display': ''}
 
     en_raw = content[:first_cn].strip()
     zh_raw = content[first_cn:].strip()
 
-    # Pull trailing POS off the English fragment
     pos = ''
-    # Handle compound "v. & n." / "n. & v." first
     m = re.search(r'([nv]\.\s*[&＆]\s*[nv]\.)\s*$', en_raw)
     if m:
         pos = m.group(1)
@@ -92,7 +170,7 @@ def build_rows(words, mode):
         w1 = words[i]
         w2 = words[i + 1] if i + 1 < len(words) else None
         l_en = w1['en_clean'] if mode == 'answer' else ''
-        r_num = w2['num']       if w2 else ''
+        r_num = w2['num']        if w2 else ''
         r_zh  = w2['zh_display'] if w2 else ''
         r_en  = (w2['en_clean'] if mode == 'answer' else '') if w2 else ''
         rows.append(
@@ -106,17 +184,18 @@ def build_rows(words, mode):
             f'<td class="col-en">{r_en}</td>'
             f'</tr>'
         )
-    return '\n'.join(rows)
+    return '\n                '.join(rows)
 
 
-def render(template, subtitle, total, rows, is_answer):
-    html = (template
-            .replace('{{TITLE}}',      '单词默写测验')
+def render(subtitle, total, rows, theme, title):
+    html = TEMPLATE
+    for key, val in theme.items():
+        html = html.replace('{{' + key + '}}', val)
+    html = (html
+            .replace('{{TITLE}}',      title)
             .replace('{{SUBTITLE}}',   subtitle)
             .replace('{{TOTAL}}',      str(total))
             .replace('{{TABLE_ROWS}}', rows))
-    if is_answer:
-        html = html.replace('</style>', ANSWER_THEME + '\n    </style>')
     return html
 
 
@@ -133,8 +212,7 @@ def to_pdf(html_path):
 def main():
     parser = argparse.ArgumentParser(description='Generate word dictation test HTML + PDF')
     parser.add_argument('input_file')
-    parser.add_argument('output_dir', nargs='?', default=None,
-                        help='Output directory (default: same as input file)')
+    parser.add_argument('output_dir', nargs='?', default=None)
     parser.add_argument('--order', choices=['original', 'random'], default='original')
     args = parser.parse_args()
 
@@ -143,9 +221,6 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     fname = os.path.basename(input_path)
-
-    # Parse grade and unit from filename
-    # Supports: "9年级_词汇表_Unit2_..." and "7年级下_2单元_..."
     g = re.search(r'(\d+年级[上下]?)', fname)
     u = re.search(r'(Unit\d+|\d+单元)', fname, re.IGNORECASE)
     grade    = g.group(1) if g else ''
@@ -166,9 +241,6 @@ def main():
     today     = datetime.datetime.now().strftime('%Y.%m.%d')
     base      = f"{grade}_{unit}_单词默写_{order_str}_{today}"
 
-    with open(TEMPLATE, encoding='utf-8') as f:
-        template = f.read()
-
     # Copy logo to output directory
     logo_dest = os.path.join(out_dir, 'teacher_logo.jpg')
     if os.path.exists(LOGO_SRC) and not os.path.exists(logo_dest):
@@ -176,17 +248,17 @@ def main():
 
     total = len(words)
 
-    # --- Test ---
+    # Test
     test_path = os.path.join(out_dir, f"{base}.html")
     with open(test_path, 'w', encoding='utf-8') as f:
-        f.write(render(template, subtitle, total, build_rows(words, 'test'), False))
+        f.write(render(subtitle, total, build_rows(words, 'test'), BLUE, '单词默写测验'))
     print(f"Test HTML  → {test_path}")
     to_pdf(test_path)
 
-    # --- Answer ---
+    # Answer
     ans_path = os.path.join(out_dir, f"{base}_答案.html")
     with open(ans_path, 'w', encoding='utf-8') as f:
-        f.write(render(template, subtitle, total, build_rows(words, 'answer'), True))
+        f.write(render(subtitle, total, build_rows(words, 'answer'), GREEN, '单词默写测验'))
     print(f"Answer HTML → {ans_path}")
     to_pdf(ans_path)
 
