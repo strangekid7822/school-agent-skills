@@ -171,10 +171,11 @@ def parse_entry(num, content):
             break
 
     # Pull trailing POS off the English fragment.
-    # Check compound POS first (e.g. "v. & n.", "adj. & adv.")
+    # Match full POS block: units joined by ", " or " & " e.g. "prep., adv. & conj."
     pos = ''
-    _pos_alt = r'(?:adj|adv|prep|conj|pron|interj|inter|num|art|int|pl|[nv])\.'
-    m = re.search(rf'({_pos_alt}\s*[&＆]\s*{_pos_alt})\s*$', en_raw)
+    _pos_unit = r'(?:adj|adv|prep|conj|pron|interj|inter|num|art|int|pl|[nv])\.'
+    _pos_block = rf'(?:{_pos_unit}(?:\s*[,，]\s*|\s*[&＆]\s*))*{_pos_unit}'
+    m = re.search(rf'({_pos_block})\s*$', en_raw)
     if m:
         pos = m.group(1)
         en_raw = en_raw[:m.start()].strip()
@@ -191,17 +192,24 @@ def parse_entry(num, content):
 
 def parse_file(filepath):
     words = []
+    entry_num = 0  # track current numbered entry for sub-items
     with open(filepath, encoding='utf-8') as f:
         for line in f:
-            line = line.strip()
-            if not line or line.startswith('=') or line.startswith('-'):
+            stripped = line.strip()
+            if not stripped or stripped.startswith('=') or stripped.startswith('-'):
                 continue
             # Stop at proper noun section (地名/人名)
-            if '地名' in line or '人名' in line:
+            if '地名' in stripped or '人名' in stripped:
                 break
-            m = re.match(r'^(\d+)\.\s+(.*)', line)
+            # Match numbered entry (with or without space after dot)
+            m = re.match(r'^(\d+)\.\s*(.*)', stripped)
             if m:
-                words.append(parse_entry(m.group(1), m.group(2)))
+                entry_num += 1
+                words.append(parse_entry(str(entry_num), m.group(2)))
+            elif line.startswith((' ', '\t')) and stripped:
+                # Indented sub-item — treat as its own vocab entry
+                entry_num += 1
+                words.append(parse_entry(str(entry_num), stripped))
     return words
 
 

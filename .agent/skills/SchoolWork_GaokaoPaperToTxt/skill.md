@@ -1,6 +1,6 @@
 ---
 name: SchoolWork_GaokaoPaperToTxt
-description: Extract Gaokao English paper content from screenshots and format it into a structured text document. Supports 单项选择, 语法填空, 完形填空, 阅读理解 (A/B/C/D), 七选五, and 任务型阅读.
+description: Extract Gaokao English paper content from screenshots and format it into a structured text document. Supports 单项选择, 语法填空, 完形填空, 阅读理解 (A/B/C/D), 七选五, 任务型阅读, and 补全对话.
 ---
 
 # Gaokao Paper to Text
@@ -376,6 +376,62 @@ word2 - part of speech. definition
 
 ---
 
+### 补全对话 (Dialogue Completion)
+
+**Format overview:** A multi-turn dialogue between two speakers (typically A and B) with numbered blanks. A separate numbered answer bank is provided below the dialogue. Students choose the sentence that best fits each blank.
+
+**Extract:**
+1. The full dialogue, preserving speaker labels (A: / B:) and blank markers. Render each blank as `(N)___________________` — the number in parentheses followed by a long underscore line — matching the original numbering.
+2. **Answers are always model-generated** (this overrides Rule 1). For each blank, write the most natural and contextually appropriate sentence a student should produce. Then give a brief Chinese explanation of the communicative function (e.g., 询问内容、发出邀请、表示同意) and note one or two acceptable alternatives if relevant.
+3. Vocabulary: fill in ~10–15 key phrases, functional expressions, and content words from the dialogue using the standard `word/phrase - part of speech. Chinese definition` format.
+
+**Answer format for 答案解析:**
+```
+N. [Model answer sentence]
+【解析】...（brief Chinese explanation of communicative function and context fit; note alternatives if applicable）
+```
+
+**Output template:**
+```text
+[Title]
+========================================
+
+【补全对话·习题】
+
+A: [line]
+B: (41)___________________?
+A: [line]
+B: [line] (42)___________________?
+A: [line] (43)___________________?
+...
+
+【补全对话·答案解析】
+
+41. What is it about?
+【解析】...
+
+42. Have you heard about it?
+【解析】...
+
+...
+
+【补全对话·重点词汇】
+
+word1 - part of speech. definition
+word2 - part of speech. definition
+...
+
+========================================
+```
+
+**Notes:**
+- There is **no 选项 section** — this is an open-ended writing task, not multiple choice.
+- If the dialogue has an instruction line above it, include it verbatim before the dialogue as a plain-text line.
+- Preserve any stage directions or parenthetical context clues in the dialogue (e.g., "（pointing to the screen）") exactly as shown.
+- There is no 难句翻译 section for 补全对话 — omit it entirely.
+
+---
+
 ## General Rules (All Types)
 
 - Output everything inside a **plain text code block**.
@@ -395,3 +451,4 @@ word2 - part of speech. definition
 - **完形填空 example:** `examples/example_output_wanxingtiankong.txt`
 - **七选五 example:** `examples/example_output_qixuanwu.txt`
 - **阅读理解 example:** `examples/example_output_yuedulijie.txt`
+- **补全对话 example:** `examples/example_output_buquanduihua.txt`

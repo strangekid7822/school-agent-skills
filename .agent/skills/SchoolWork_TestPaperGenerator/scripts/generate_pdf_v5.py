@@ -163,7 +163,9 @@ body {
     width: 100%;
     border-collapse: collapse;
 }
-/* one-row layout: cells share width equally, no wrapping */
+/* one-row layout: fixed equal-width columns so options align across all
+   questions (every column starts at the same x-position, regardless of text) */
+.reading-opts-table.one-row { table-layout: fixed; }
 .reading-opts-table.one-row .reading-opt-cell {
     padding: 2px 12px 2px 0;
     font-family: Georgia, 'Times New Roman', serif;
@@ -829,19 +831,25 @@ def render_mc_questions(name, content):
             continue
 
         if options_fit_one_row(opts):
-            # Options inline after the question text (same line)
-            inline_opts = '&emsp;'.join(
-                f'<span class="reading-opt-letter">{e(ltr)}.</span>{e(txt)}'
-                for ltr, txt in opts
-            )
+            # Short options: equal-width columns on one row below the stem
+            # (same aligned table layout as 阅读理解), not inline flowing text.
             q_html = (
                 f'<div class="mc-q-header">'
                 f'<span class="mc-answer-slot">{SLOT}</span>'
                 f'<span class="mc-q-num">{e(q["num"])}.</span>'
-                f'<span class="mc-q-text">{text_html}&emsp;{inline_opts}</span>'
+                f'<span class="mc-q-text">{text_html}</span>'
                 f'</div>'
             )
-            items.append(f'<div class="mc-question">{q_html}</div>')
+            cells = ''.join(
+                f'<td class="reading-opt-cell">'
+                f'<span class="reading-opt-letter">{e(ltr)}.</span>{e(txt)}'
+                f'</td>'
+                for ltr, txt in opts
+            )
+            opts_html = (
+                f'<table class="reading-opts-table one-row"><tr>{cells}</tr></table>'
+            )
+            items.append(f'<div class="mc-question">{q_html}{opts_html}</div>')
         else:
             q_html = (
                 f'<div class="mc-q-header">'

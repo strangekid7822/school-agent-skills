@@ -96,18 +96,22 @@ body {
     line-height: 1.65;
 }
 
+.q-body {
+    flex: 1;
+    min-width: 0;
+}
+
 /* Options */
 .opts-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1px;
-    padding-left: 3em;
     box-sizing: border-box;
     table-layout: fixed;
 }
 .opt-td {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 10pt;
+    font-size: 10.5pt;
     color: #333;
     vertical-align: top;
     padding: 1px 6px 1px 0;
@@ -115,11 +119,17 @@ body {
     word-break: break-word;
 }
 .opt-letter {
-    font-weight: 700;
     color: #111;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 9.5pt;
+    font-size: 10.5pt;
     margin-right: 2px;
+}
+
+.opts-stacked { margin-top: 1px; }
+.opt-stack {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10.5pt;
+    color: #333;
+    line-height: 1.6;
 }
 
 @media print {
@@ -184,18 +194,29 @@ def parse_questions(filepath):
             else:
                 q_text_parts.append(stripped)
 
-        q_text = ' '.join(q_text_parts)
+        # Join dialogue lines (starting with —) with <br>, others with space
+        joined_parts = []
+        for part in q_text_parts:
+            if joined_parts and (part.startswith('—') or joined_parts[-1].startswith('—')):
+                joined_parts.append('<br>' + html_module.escape(part))
+            else:
+                if joined_parts:
+                    joined_parts.append(' ' + html_module.escape(part))
+                else:
+                    joined_parts.append(html_module.escape(part))
+        q_text = ''.join(joined_parts)
 
         opts = []
         if len(opts_raw) == 1:
-            parts = re.split(r'\s{3,}(?=[A-D]\.)', opts_raw[0])
+            # Split before B./C./D. on any whitespace; A. is always the start
+            parts = re.split(r'\s+(?=[B-D]\.)', opts_raw[0])
             for part in parts:
                 pm = re.match(r'^([A-D])\.\s*(.+)', part.strip())
                 if pm:
                     opts.append((pm.group(1), pm.group(2).strip()))
         else:
             for ol in opts_raw:
-                parts = re.split(r'\s{3,}(?=[A-D]\.)', ol)
+                parts = re.split(r'\s{2,}(?=[A-D]\.)', ol)
                 for part in parts:
                     pm = re.match(r'^([A-D])\.\s*(.+)', part.strip())
                     if pm:
@@ -209,16 +230,16 @@ def parse_questions(filepath):
 # ── HTML rendering ─────────────────────────────────────────────────────────────
 
 def render_question(global_num, q):
-    question_row = (
-        f'<div class="question-row">'
-        f'<span class="q-prefix">( &nbsp;)&nbsp;<span class="q-num">{global_num}.</span>&nbsp;</span>'
-        f'<span class="q-text">{e(q["text"])}</span>'
-        f'</div>'
-    )
-
     opts = q['opts']
     if not opts:
         opts_html = ''
+    elif any(len(txt) > 20 for _, txt in opts):
+        # Stack each option on its own line
+        rows = ''.join(
+            f'<div class="opt-stack"><span class="opt-letter">{e(ltr)}.</span>{e(txt)}</div>'
+            for ltr, txt in opts
+        )
+        opts_html = f'<div class="opts-stacked">{rows}</div>'
     else:
         n = len(opts)
         col_pct = f'{100 // n}%'
@@ -232,8 +253,13 @@ def render_question(global_num, q):
 
     return (
         f'<div class="question-block">'
-        f'{question_row}'
+        f'<div class="question-row">'
+        f'<span class="q-prefix">( &nbsp;)&nbsp;<span class="q-num">{global_num}.</span>&nbsp;</span>'
+        f'<div class="q-body">'
+        f'<span class="q-text">{q["text"]}</span>'
         f'{opts_html}'
+        f'</div>'
+        f'</div>'
         f'</div>'
     )
 

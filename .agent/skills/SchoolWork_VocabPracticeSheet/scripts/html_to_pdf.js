@@ -26,11 +26,14 @@ async function htmlToPdf(inputHtml, outputPdf) {
     console.log(`Converting: ${htmlPath}`);
     console.log(`Output: ${pdfPath}`);
     
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.launch({
+        headless: 'new',
+        executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+    });
     const page = await browser.newPage();
     
     // Load HTML file
-    await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle0' });
+    await page.goto(`file://${htmlPath}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     
     // Generate PDF with A4 LANDSCAPE settings
     await page.pdf({

@@ -14,7 +14,7 @@ Combine any number of 单项选择 `.txt` files into one formatted A4 PDF. Quest
 Run this exact command:
 
 ```bash
-python ".agent/skills/TestPaperGenerator_DanxiangxuanzeCombination/scripts/generate.py" \
+python3 ".agent/skills/SchoolWork_TestPaperGenerator_Danxuan/scripts/generate.py" \
     "file1.txt" "file2.txt" ... \
     --output OUTPUT_STEM \
     [--output-dir /path/to/dir] \
@@ -94,7 +94,7 @@ Uses `SchoolWork_WordTestGenerator/scripts/node_modules` — **do NOT run `npm i
 
 **Basic — combine 5 papers:**
 ```bash
-python ".agent/skills/TestPaperGenerator_DanxiangxuanzeCombination/scripts/generate.py" \
+python3 ".agent/skills/SchoolWork_TestPaperGenerator_Danxuan/scripts/generate.py" \
     "试卷1_单项选择.txt" "试卷2_单项选择.txt" "试卷3_单项选择.txt" \
     "试卷4_单项选择.txt" "试卷5_单项选择.txt" \
     --output "英语单项选择综合卷_1-5"
@@ -102,7 +102,7 @@ python ".agent/skills/TestPaperGenerator_DanxiangxuanzeCombination/scripts/gener
 
 **Append new papers (starting at 试卷 6):**
 ```bash
-python ".agent/skills/TestPaperGenerator_DanxiangxuanzeCombination/scripts/generate.py" \
+python3 ".agent/skills/SchoolWork_TestPaperGenerator_Danxuan/scripts/generate.py" \
     "试卷6_单项选择.txt" "试卷7_单项选择.txt" \
     --output "英语单项选择_6-7" \
     --start 6
@@ -110,7 +110,7 @@ python ".agent/skills/TestPaperGenerator_DanxiangxuanzeCombination/scripts/gener
 
 **Custom title:**
 ```bash
-python ".agent/skills/TestPaperGenerator_DanxiangxuanzeCombination/scripts/generate.py" \
+python3 ".agent/skills/SchoolWork_TestPaperGenerator_Danxuan/scripts/generate.py" \
     "卷1.txt" "卷2.txt" \
     --output "期末单选综合" \
     --title "期末复习·单项选择专项"
