@@ -226,6 +226,28 @@ body {
     line-height: 1.6;
 }
 
+/* ── Word Bank (选词填空) ── */
+.wordbank-box {
+    border: 1.5px solid #555;
+    border-radius: 3px;
+    padding: 8px 16px;
+    margin-bottom: 13px;
+    background: #fafafa;
+}
+.wordbank-row {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    padding: 3px 0;
+}
+.wordbank-word {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10.5pt;
+    color: #111;
+    white-space: nowrap;
+}
+
 /* ── Translation Practice (question side) ── */
 .trans-practice-item {
     margin-bottom: 16px;
@@ -581,12 +603,14 @@ def process_passage_text(text):
     Bold+underline (**__...__**) is supported via nesting.
     """
     escaped = e(text)
-    # Numbered blanks
-    escaped = re.sub(
-        r'___(\d+)___',
-        r'<span class="blank">___<span class="blank-inner">\1</span>___</span>',
-        escaped
-    )
+    # Protect numbered blanks FIRST with underscore-free placeholders, so the
+    # bold/underline passes below cannot match the blank's own underscores
+    # (e.g. the underline regex would otherwise eat '___61___' → '_61_').
+    blanks = []
+    def _stash(m):
+        blanks.append(m.group(1))
+        return f'\x00BLK{len(blanks) - 1}\x00'
+    escaped = re.sub(r'___(\d+)___', _stash, escaped)
     # Bold+underline combined: **__...__**
     escaped = re.sub(
         r'\*\*__(.+?)__\*\*',
@@ -604,6 +628,12 @@ def process_passage_text(text):
     escaped = re.sub(
         r'__([^_].*?)__',
         r'<span class="passage-underline">\1</span>',
+        escaped
+    )
+    # Restore numbered blanks as styled spans.
+    escaped = re.sub(
+        r'\x00BLK(\d+)\x00',
+        lambda m: f'<span class="blank">___<span class="blank-inner">{blanks[int(m.group(1))]}</span>___</span>',
         escaped
     )
     return escaped
@@ -902,6 +932,27 @@ def render_options(name, content):
     return f'<section class="section">{box}</section>'
 
 
+def render_wordbank(name, content):
+    """选词填空·词库: bank of selectable words in a bordered box.
+
+    Preserves the row layout from the txt. Items within a row are separated by
+    runs of 2+ spaces, so multi-word phrases (e.g. 'in danger') stay intact."""
+    rows_html = []
+    for line in content.split('\n'):
+        if not line.strip():
+            continue
+        words = [w.strip() for w in re.split(r'\s{2,}', line.strip()) if w.strip()]
+        cells = ''.join(f'<span class="wordbank-word">{e(w)}</span>' for w in words)
+        rows_html.append(f'<div class="wordbank-row">{cells}</div>')
+    if not rows_html:
+        return ''
+    return (
+        f'<section class="section">'
+        f'<div class="wordbank-box">{"".join(rows_html)}</div>'
+        f'</section>'
+    )
+
+
 def render_vocab_practice(name, content):
     """Question-side: English words in 3-column grid with blank fill line.
     Extracts the English portion from lines that also have Chinese meanings."""
@@ -1034,11 +1085,19 @@ def render_answer_block(block):
     else:
         header_raw, jiexi = first_line, ''
 
-    m = re.match(r'^(\d+)\.\s*(\S+)\s*(.*)', header_raw.strip())
-    if not m:
+    m = re.match(r'^(\d+)\.\s*(.*)', header_raw.strip())
+    if not m or not m.group(2).strip():
         return f'<div class="answer-entry"><div class="generic-para">{e(block)}</div></div>'
 
-    num, answer, note = m.group(1), m.group(2).strip(), m.group(3).strip()
+    num, rest = m.group(1), m.group(2).strip()
+    # The answer is English (a letter or a word/phrase); the optional 考查点/题型
+    # note is Chinese. Split at the first CJK char so multi-word answers like
+    # "to present" or "in danger" stay intact instead of being cut at a space.
+    cjk = re.search(r'[一-龥]', rest)
+    if cjk:
+        answer, note = rest[:cjk.start()].strip(), rest[cjk.start():].strip()
+    else:
+        answer, note = rest, ''
     is_single_letter = (len(answer) == 1 and answer.isalpha() and answer.isupper())
     answer_class = 'answer-letter-big' if is_single_letter else 'answer-word'
 
@@ -1187,7 +1246,9 @@ def generate_html(title, sections):
     q_parts = [header_html]
     for section in sections:
         name, content = section['name'], section['content']
-        if '·原文' in name:
+        if '·词库' in name:
+            q_parts.append(render_wordbank(name, content))
+        elif '·原文' in name:
             q_parts.append(render_passage(name, content))
         elif '·习题' in name:
             if qtype.startswith('阅读理解'):

@@ -31,8 +31,9 @@ A structured `.txt` file with sections marked by `【...】` headers:
 Title_line
 ========================================
 
+【题型·词库】       ← word bank: rows of selectable words (选词填空)
 【题型·原文】       ← passage with ___36___ blanks (完形填空/语法填空)
-【题型·习题】       ← numbered questions + A/B/C/D options (阅读理解)
+【题型·习题】       ← numbered questions + A/B/C/D options (阅读理解), or passage with ___N___ blanks (选词填空/语法填空)
 【题型·选项】       ← A–G option list (七选五) or per-question ABCD (完形填空)
 【题型·答案解析】   ← numbered answers with 【解析】
 【题型·重点词汇】   ← word list: English-only OR "word - n. 中文" pairs
@@ -40,7 +41,7 @@ Title_line
 ========================================
 ```
 
-Supported question types: 七选五, 完形填空, 语法填空, 阅读理解, and any other format using the same structure.
+Supported question types: 七选五, 完形填空, 语法填空, 选词填空, 阅读理解, and any other format using the same structure.
 
 ## Output
 
@@ -68,6 +69,7 @@ Two-part layout separated by a `━━ 参 考 答 案 ━━` divider with page
 
 **Question part:**
 - Header: logo + bold title + grey subtitle (always from filename stem)
+- 选词填空·词库: rows of selectable words in a bordered box, shown above the passage; multi-word items (e.g. `in danger`) are kept intact (items split on 2+ spaces)
 - Passage (原文): Georgia serif, `___36___` blanks, auto-detected passage title
 - 阅读理解·习题: each question parsed individually — bold number + question text, then options in an **adaptive layout**: one row if all options are short (total chars across all options ≤ 72), otherwise one option per line
 - Options (other types):
@@ -100,6 +102,7 @@ Each question type has a reference HTML in `examples/`. Do not modify the exampl
 | 七选五 | `examples/example_七选五.html` |
 | 完形填空 | `examples/example_完形填空.html` |
 | 阅读理解 | `examples/example_阅读理解.html` |
+| 选词填空 | `examples/example_选词填空.html` |
 
 ## Usage example
 
