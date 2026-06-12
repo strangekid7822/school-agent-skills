@@ -1,6 +1,6 @@
 ---
 name: SchoolWork_GaokaoPaperToTxt
-description: Extract Gaokao English paper content from screenshots and format it into a structured text document. Supports 单项选择, 语法填空, 完形填空, 阅读理解 (A/B/C/D), 七选五, 任务型阅读, and 补全对话.
+description: Extract Gaokao English paper content from screenshots and format it into a structured text document. Supports 单项选择, 语法填空, 选词填空, 完形填空, 阅读理解 (A/B/C/D), 七选五, 任务型阅读, and 补全对话.
 ---
 
 # Gaokao Paper to Text
@@ -166,6 +166,63 @@ word2 - part of speech. definition
 
 ========================================
 ```
+
+---
+
+### 选词填空 (Word Bank Fill-in-the-Blank)
+
+**Format overview:** A passage with numbered blanks and a separate word bank. The word bank may contain exactly the same number of words as blanks or may include extra distractor words. Common sets include 5, 7, or 10 blanks, but always preserve the numbering shown in the screenshot.
+
+**Extract:**
+1. The word bank exactly as shown, preserving all words and phrases, including unused distractors.
+2. The reading passage. Reformat any numbered blanks to `___[number]___` format (e.g., `61` or `61 _________` → `___61___`).
+3. Preserve the original blank numbering and do not renumber blanks, even when there are 5, 7, or 10 blanks.
+4. Answers and explanations — **only if the user requests 答案解析** (see Rule 1). If an answer key is visible in the screenshot, extract it. If no answer key is visible but the user requests answers, infer the correct word from the word bank and passage context.
+5. When answers require a changed word form, write the filled form as the answer and mention the original word from the word bank in the explanation.
+6. Difficult sentence translation: same rule as 语法填空 — extract only if present, otherwise omit.
+7. Vocabulary: fill in ~10–20 essential Gaokao words/phrases (see Rule 2).
+
+**Output template:**
+```text
+[Title]
+========================================
+
+【选词填空·词库】
+
+word1    word2    word3    word4    word5
+word6    ...
+
+【选词填空·习题】
+
+[Passage with ___N___ blanks]
+
+【选词填空·答案解析】         ← omit entirely if not requested
+
+61. [answer]
+【解析】...
+
+62. [answer]
+【解析】...
+
+【选词填空·重点词汇】
+
+word1 - part of speech. definition
+word2 - part of speech. definition
+...
+
+【选词填空·难句翻译】
+
+[English sentence]
+[Chinese translation]
+
+========================================
+```
+
+**Notes:**
+- Use `【选词填空·词库】`, not `【选词填空·选项】`, because these are word-bank choices rather than A/B/C/D options.
+- Keep word-bank items in their original order. Do not remove unused words.
+- If the word bank is split across multiple lines in the screenshot, keep a readable plain-text layout while preserving item order.
+- If the screenshot includes an answer key such as `61-65 felt putting heavily mess closer`, convert it into numbered answers under `答案解析` only when answers are requested.
 
 ---
 
@@ -437,7 +494,7 @@ word2 - part of speech. definition
 - Output everything inside a **plain text code block**.
 - **Title format:** The first line must be `[PaperOrigin]_[SectionType]` (e.g., `2021中考模拟题库_英语试卷1_单项选择`, `2023高考真题_全国卷I_阅读理解D`). The paper origin comes from the user's instruction or the screenshot context.
 - Preserve original question/blank numbering from the screenshots.
-- Never invent answers, sentences, or vocabulary — extract only what is visible.
+- Do not invent source passages, questions, options, word-bank items, or visible answer keys. Generate answers/explanations/vocabulary only where the section-specific rules explicitly require or allow it.
 - **答案解析 explanations:** Address key wrong options briefly — do not make each explanation overly long.
 - **重点词汇 format:** Every item must include its Chinese definition, using `word/phrase - part of speech. Chinese definition` (see 阅读理解 example). Mix single words and collocations/grammar patterns as appropriate.
 - If a section has no content (e.g., no difficult sentence), omit that section entirely rather than leaving a blank header.
@@ -448,6 +505,7 @@ word2 - part of speech. definition
 
 - **单项选择 example:** `examples/example_output_danxiangxuanze.txt`
 - **语法填空 example:** `examples/example_output_yufatiankong.txt`
+- **选词填空 example:** `examples/example_output_xuancitiankong.txt`
 - **完形填空 example:** `examples/example_output_wanxingtiankong.txt`
 - **七选五 example:** `examples/example_output_qixuanwu.txt`
 - **阅读理解 example:** `examples/example_output_yuedulijie.txt`
