@@ -177,7 +177,9 @@ word2 - part of speech. definition
 1. The word bank exactly as shown, preserving all words and phrases, including unused distractors.
 2. The reading passage. Reformat any numbered blanks to `___[number]___` format (e.g., `61` or `61 _________` → `___61___`).
 3. Preserve the original blank numbering and do not renumber blanks, even when there are 5, 7, or 10 blanks.
-4. Answers and explanations — **only if the user requests 答案解析** (see Rule 1). If an answer key is visible in the screenshot, extract it. If no answer key is visible but the user requests answers, infer the correct word from the word bank and passage context.
+4. Answers and explanations:
+   - If an **answer key is visible in the screenshot**, always extract it into 答案解析 (this overrides Rule 1).
+   - If no answer key is visible, generate 答案解析 **only if the user requests it** (see Rule 1), inferring the correct word from the word bank and passage context.
 5. When answers require a changed word form, write the filled form as the answer and mention the original word from the word bank in the explanation.
 6. Difficult sentence translation: same rule as 语法填空 — extract only if present, otherwise omit.
 7. Vocabulary: fill in ~10–20 essential Gaokao words/phrases (see Rule 2).
