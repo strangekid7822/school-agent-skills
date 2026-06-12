@@ -460,26 +460,36 @@ body {
     margin-bottom: 5px;
 }
 .mc-answer-slot {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Georgia, 'Times New Roman', serif;
     font-size: 10pt;
-    color: #999;
+    color: #111;
     flex-shrink: 0;
     white-space: nowrap;
     letter-spacing: 0.05em;
     padding-top: 1px;
 }
 .mc-q-num {
-    font-weight: 700;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    font-family: Georgia, 'Times New Roman', serif;
     font-size: 10.5pt;
     flex-shrink: 0;
     padding-top: 1px;
+}
+.mc-q-body {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 .mc-q-text {
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 10.5pt;
     color: #111;
     line-height: 1.65;
+}
+.mc-q-body .reading-opts-table { margin-top: 4px; }
+/* 单项选择: option letters share the question-text font and are not bold */
+.mc-q-body .reading-opt-letter {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
 }
 .mc-blank {
     display: inline-block;
@@ -653,14 +663,30 @@ def render_passage(name, content):
 
 
 def parse_option_line(line):
-    """Parse a line that may have one or two options like 'A. text   B. text'."""
-    # Split on 3+ spaces before an option letter to handle two-per-line format
-    parts = re.split(r'\s{3,}(?=[A-D]\.)', line.strip())
+    """Parse a line with one or more options like 'A. text   B. text C. text'.
+
+    Splits on option-letter markers that appear in increasing sequence
+    (A→B→C→D), so options separated by even a single space are parsed
+    correctly, while a stray 'X.' inside option text does not cause a false
+    split (it would break the expected A/B/C/D order)."""
+    line = line.strip()
+    # Candidate markers: capital A-D + '.' + space, at line start or after space.
+    markers = [(m.start(1), m.group(1))
+               for m in re.finditer(r'(?:(?<=\s)|^)([A-D])\.(?=\s)', line)]
+    if not markers:
+        return []
+    # Keep only markers forming an increasing run from the first one.
+    seq, expected = [], markers[0][1]
+    for pos, ltr in markers:
+        if ltr == expected:
+            seq.append((pos, ltr))
+            expected = chr(ord(expected) + 1)
     opts = []
-    for part in parts:
-        m = re.match(r'^([A-D])\.\s*(.+)', part.strip())
+    for i, (pos, ltr) in enumerate(seq):
+        end = seq[i + 1][0] if i + 1 < len(seq) else len(line)
+        m = re.match(r'^[A-D]\.\s*(.+)', line[pos:end].strip())
         if m:
-            opts.append((m.group(1), m.group(2).strip()))
+            opts.append((ltr, m.group(1).strip()))
     return opts
 
 
@@ -819,27 +845,13 @@ def render_mc_questions(name, content):
         text_html = '<br>'.join(process_mc_text(l) for l in q['lines'])
         opts = q['opts']
 
+        # The body column (question text + options) is a flex child placed
+        # after the slot and number, so the options align with the first
+        # character of the question text — not under the ( ) / number.
         if not opts:
-            q_html = (
-                f'<div class="mc-q-header">'
-                f'<span class="mc-answer-slot">{SLOT}</span>'
-                f'<span class="mc-q-num">{e(q["num"])}.</span>'
-                f'<span class="mc-q-text">{text_html}</span>'
-                f'</div>'
-            )
-            items.append(f'<div class="mc-question">{q_html}</div>')
-            continue
-
-        if options_fit_one_row(opts):
-            # Short options: equal-width columns on one row below the stem
-            # (same aligned table layout as 阅读理解), not inline flowing text.
-            q_html = (
-                f'<div class="mc-q-header">'
-                f'<span class="mc-answer-slot">{SLOT}</span>'
-                f'<span class="mc-q-num">{e(q["num"])}.</span>'
-                f'<span class="mc-q-text">{text_html}</span>'
-                f'</div>'
-            )
+            body = f'<div class="mc-q-text">{text_html}</div>'
+        elif options_fit_one_row(opts):
+            # Short options: equal-width columns on one row below the stem.
             cells = ''.join(
                 f'<td class="reading-opt-cell">'
                 f'<span class="reading-opt-letter">{e(ltr)}.</span>{e(txt)}'
@@ -849,15 +861,8 @@ def render_mc_questions(name, content):
             opts_html = (
                 f'<table class="reading-opts-table one-row"><tr>{cells}</tr></table>'
             )
-            items.append(f'<div class="mc-question">{q_html}{opts_html}</div>')
+            body = f'<div class="mc-q-text">{text_html}</div>{opts_html}'
         else:
-            q_html = (
-                f'<div class="mc-q-header">'
-                f'<span class="mc-answer-slot">{SLOT}</span>'
-                f'<span class="mc-q-num">{e(q["num"])}.</span>'
-                f'<span class="mc-q-text">{text_html}</span>'
-                f'</div>'
-            )
             rows = ''.join(
                 f'<tr><td class="reading-opt-cell">'
                 f'<span class="reading-opt-letter">{e(ltr)}.</span>{e(txt)}'
@@ -865,7 +870,16 @@ def render_mc_questions(name, content):
                 for ltr, txt in opts
             )
             opts_html = f'<table class="reading-opts-table per-line">{rows}</table>'
-            items.append(f'<div class="mc-question">{q_html}{opts_html}</div>')
+            body = f'<div class="mc-q-text">{text_html}</div>{opts_html}'
+
+        q_html = (
+            f'<div class="mc-q-header">'
+            f'<span class="mc-answer-slot">{SLOT}</span>'
+            f'<span class="mc-q-num">{e(q["num"])}.</span>'
+            f'<div class="mc-q-body">{body}</div>'
+            f'</div>'
+        )
+        items.append(f'<div class="mc-question">{q_html}</div>')
 
     return f'<section class="section">{"".join(items)}</section>'
 
