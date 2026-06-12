@@ -1,6 +1,6 @@
 ---
 name: SchoolWork_TestBookletGenerator
-description: Combine a FOLDER of per-school single-section exam papers (语法填空, 单项选择, 完形填空, 阅读理解, 七选五) into one A4 booklet PDF. Each paper is a labeled section with its original numbering; a compact, per-paper grouped answer key (answers only — no explanations, no vocabulary) goes in the back.
+description: Combine a FOLDER of per-school single-section exam papers (语法填空, 选词填空, 单项选择, 完形填空, 阅读理解, 七选五) into one A4 booklet PDF. Each paper is a labeled section with its original numbering; a compact, per-paper grouped answer key (answers only — no explanations, no vocabulary) goes in the back.
 ---
 
 # TestBookletGenerator Skill
@@ -33,7 +33,10 @@ should be the same section type. Files are combined in filename-sorted order.
 Each file's first line is its title (e.g. `2024_八年级下_期末_南岗区_英语_语法填空`),
 from which the per-paper label (`2024 · 八年级下 · 期末 · 南岗区`) is derived.
 
-Supported types: **语法填空, 单项选择, 完形填空, 阅读理解(A/B/C/D), 七选五.**
+Supported types: **语法填空, 选词填空, 单项选择, 完形填空, 阅读理解(A/B/C/D), 七选五.**
+
+For **选词填空**, the per-paper `【选词填空·词库】` word bank is rendered as a bordered
+box above each passage; multi-word bank items (e.g. `hang out`) stay intact.
 
 ## Output
 
@@ -48,14 +51,14 @@ title `8年级下`, subtitle `语法填空 · 哈尔滨`). If omitted, the input
 
 **Question part** — for each paper, in order:
 - A per-paper label heading (underlined).
-- The paper's content rendered by section type (passage with `___N___` blanks,
-  单项选择 questions, 完形填空 option grid, 阅读理解 questions, 七选五 options),
-  keeping the paper's **original numbering** (66–75, 96–105, …).
+- The paper's content rendered by section type (选词填空 word bank + passage with
+  `___N___` blanks, 单项选择 questions, 完形填空 option grid, 阅读理解 questions,
+  七选五 options), keeping the paper's **original numbering** (66–75, 96–105, …).
 
 **`参 考 答 案` part** (page break):
 - A **compact 5-column answer key**, grouped under each paper's label.
 - **Answers only** — `【解析】` explanations, `重点词汇`, and `难句翻译` are dropped.
-- Multi-word answers keep their full form; the cue word renders small/grey.
+- Multi-word answers (e.g. `hang out`, `in danger`, `to present`) render in full.
 
 ## Robustness
 
@@ -78,4 +81,6 @@ Do **not** run `npm install`.
 
 ## Example
 
-`examples/example_语法填空_booklet.pdf` — 19 哈尔滨 八年级下 语法填空 papers merged.
+- `examples/example_语法填空_booklet.pdf` — 19 哈尔滨 八年级下 语法填空 papers merged.
+- `examples/example_选词填空_booklet.pdf` — 5 哈尔滨 七年级下 选词填空 papers merged
+  (word bank per paper, compact answer key with multi-word answers kept whole).

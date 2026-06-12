@@ -41,7 +41,7 @@ import generate_pdf_v5 as v5  # noqa: E402
 
 # Section-type tokens stripped from filenames when deriving a paper label.
 SECTION_WORDS = [
-    '语法填空', '语法填注', '单项选择', '完形填空', '七选五',
+    '语法填空', '语法填注', '选词填空', '单项选择', '完形填空', '七选五',
     '任务型阅读', '补全对话', '阅读理解',
 ]
 
@@ -143,9 +143,12 @@ def parse_paper(path):
                 cjk = re.search(r'[一-鿿]', line)
                 if cjk:
                     line = line[:cjk.start()].strip()
-                m = re.match(r'^(\d+)\.\s*(\S+)\s*(.*)$', line)
+                # After the Chinese 考查点 is stripped, the remainder is the full
+                # English answer — keep it whole so multi-word answers like
+                # "in danger" / "hang out" / "to present" don't get split.
+                m = re.match(r'^(\d+)\.\s*(.+)$', line)
                 if m:
-                    answers.append((m.group(1), m.group(2), m.group(3).strip()))
+                    answers.append((m.group(1), m.group(2).strip(), ''))
     return {'label': label_from_title(title), 'qtype': qtype, 'sections': secs, 'answers': answers}
 
 
@@ -154,7 +157,9 @@ def render_question_side(paper):
     qtype = paper['qtype']
     parts = [f'<div class="paper-label">{e(paper["label"])}</div>']
     for name, content in paper['sections']:
-        if name.endswith('原文'):
+        if name.endswith('词库'):  # 选词填空 word bank, shown above the passage
+            parts.append(v5.render_wordbank(name, content))
+        elif name.endswith('原文'):
             parts.append(v5.render_passage(name, content))
         elif name.endswith('习题'):
             if qtype.startswith('阅读理解'):
