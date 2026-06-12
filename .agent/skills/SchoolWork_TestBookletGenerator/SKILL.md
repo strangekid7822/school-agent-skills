@@ -19,19 +19,30 @@ modify `generate_booklet.py` or the v5 script it reuses. Just run:
 
 ```bash
 python .agent/skills/SchoolWork_TestBookletGenerator/scripts/generate_booklet.py \
-  "<input_dir>" "<output_dir>" --title "<booklet_stem>"
+  "<input_dir_or_combined_file>" "<output_dir>" --title "<booklet_stem>"
 ```
+
+`<input_dir_or_combined_file>` may be a folder of single-paper `.txt` files OR
+one combined multi-paper `.txt` file (see Input). `--title` is optional; if
+omitted, the folder name (or combined file's stem) is used.
 
 If the script fails, report the error — do not rewrite it.
 
 ## Input
 
-A **folder** of `.txt` files, each in the GaokaoPaperToTxt structured format
-(`【题型·原文】`, `【题型·习题】`, `【题型·选项】`, `【题型·答案解析】`, …). All files
-should be the same section type. Files are combined in filename-sorted order.
+Either of:
 
-Each file's first line is its title (e.g. `2024_八年级下_期末_南岗区_英语_语法填空`),
-from which the per-paper label (`2024 · 八年级下 · 期末 · 南岗区`) is derived.
+1. A **folder** of `.txt` files, each in the GaokaoPaperToTxt structured format
+   (`【题型·原文】`, `【题型·习题】`, `【题型·选项】`, `【题型·答案解析】`, …). Files are
+   combined in filename-sorted order.
+2. A **single combined multi-paper `.txt` file** — several papers concatenated,
+   each as `title + ==== + sections`. Papers are split on those per-paper
+   boundaries; an optional document header (`收录范围：…` / `整理日期：…`) at the top
+   is skipped automatically.
+
+All papers should be the same section type. Each paper's first line is its title
+(e.g. `2024_八年级下_期末_南岗区_英语_语法填空`), from which the per-paper label
+(`2024 · 八年级下 · 期末 · 南岗区`) is derived.
 
 Supported types: **语法填空, 选词填空, 单项选择, 完形填空, 阅读理解(A/B/C/D), 七选五.**
 

@@ -16,9 +16,12 @@ Supports the same section types as TestPaperGenerator:
 Robust to malformed source headers (e.g. the 语法填注 vs 语法填空 typo): sections
 are matched by their suffix (习题/原文/选项/答案解析), not exact equality.
 
+Input may be EITHER a folder of single-paper .txt files OR one combined
+multi-paper .txt file (papers split on per-paper title + ==== boundaries).
+
 Usage:
-  python generate_booklet.py <input_dir> <output_dir> --title "8年级下_语法填空_哈尔滨"
-  python generate_booklet.py <input_dir> <output_dir>          # title inferred
+  python generate_booklet.py <input_dir_or_file> <output_dir> --title "8年级下_语法填空_哈尔滨"
+  python generate_booklet.py <input_dir_or_file> <output_dir>   # title inferred
 
 The script REUSES the rendering helpers from the sibling TestPaperGenerator
 skill (generate_pdf_v5.py); it does not fork or modify them.
@@ -121,10 +124,54 @@ def split_sections(lines):
     return secs
 
 
-def parse_paper(path):
+def _is_divider(s):
+    s = s.strip()
+    return bool(s) and set(s) == {'='}
+
+
+def split_combined(lines):
+    """Split a SINGLE combined multi-paper file into per-paper line blocks.
+
+    Each paper starts with a title line immediately followed by a ==== divider.
+    An optional document header (… 收录范围：… / 整理日期：… ====) at the top is
+    skipped: it is recognised by a full-width colon on the line above its divider.
+    Returns a list of line-lists, one per paper (title/divider/blanks trimmed of
+    any trailing divider so they don't leak into a section)."""
+    # Skip an optional document header: everything up to & incl. its divider.
+    start = 0
+    for i, l in enumerate(lines):
+        if _is_divider(l):
+            prev = lines[i - 1].strip() if i > 0 else ''
+            prev2 = lines[i - 2].strip() if i > 1 else ''
+            if '：' in prev or '：' in prev2:  # meta lines like 收录范围：/整理日期：
+                start = i + 1
+            break
+    body = lines[start:]
+
+    # Paper starts: a non-blank, non-【, non-divider line followed by a divider.
+    starts = []
+    for i in range(len(body) - 1):
+        cur = body[i].strip()
+        if not cur or cur.startswith('【') or _is_divider(cur):
+            continue
+        if _is_divider(body[i + 1]):
+            starts.append(i)
+    if not starts:
+        return [body]
+
+    blocks = []
+    for k, s in enumerate(starts):
+        end = starts[k + 1] if k + 1 < len(starts) else len(body)
+        block = body[s:end]
+        while block and (not block[-1].strip() or _is_divider(block[-1])):
+            block.pop()  # trim trailing blanks / closing divider
+        blocks.append(block)
+    return blocks
+
+
+def parse_paper_lines(lines, fallback_title=''):
     """Return dict {label, qtype, sections:[(name,content)], answers:[(num,ans,note)]}."""
-    lines = path.read_text(encoding='utf-8').splitlines()
-    title = next((l.strip() for l in lines if l.strip() and not l.strip().startswith('=')), path.stem)
+    title = next((l.strip() for l in lines if l.strip() and not l.strip().startswith('=')), fallback_title)
     secs = split_sections(lines)
 
     qtype = ''
@@ -150,6 +197,11 @@ def parse_paper(path):
                 if m:
                     answers.append((m.group(1), m.group(2).strip(), ''))
     return {'label': label_from_title(title), 'qtype': qtype, 'sections': secs, 'answers': answers}
+
+
+def parse_paper(path):
+    """Parse one single-paper .txt file (folder-input mode)."""
+    return parse_paper_lines(path.read_text(encoding='utf-8').splitlines(), fallback_title=path.stem)
 
 
 def render_question_side(paper):
@@ -218,25 +270,37 @@ def build_html(booklet_title, papers):
 
 def main():
     ap = argparse.ArgumentParser(description="Combine per-school papers into one booklet PDF.")
-    ap.add_argument('input_dir', help="Folder of structured .txt papers (same section type).")
+    ap.add_argument('input_dir', help="Folder of structured .txt papers, OR a single combined multi-paper .txt file.")
     ap.add_argument('output_dir', help="Where to write {title}.html and {title}.pdf.")
     ap.add_argument('--title', help="Booklet stem, e.g. 8年级下_语法填空_哈尔滨. Inferred if omitted.")
     args = ap.parse_args()
 
-    in_dir = Path(args.input_dir).resolve()
-    files = sorted(p for p in in_dir.glob('*.txt'))
-    if not files:
-        print(f"Error: no .txt files in {in_dir}")
-        sys.exit(1)
-
-    papers = [parse_paper(f) for f in files]
+    in_path = Path(args.input_dir).resolve()
+    if in_path.is_dir():
+        files = sorted(p for p in in_path.glob('*.txt'))
+        if not files:
+            print(f"Error: no .txt files in {in_path}")
+            sys.exit(1)
+        papers = [parse_paper(f) for f in files]
+        sources = [f.name for f in files]
+        default_title = in_path.name
+    else:
+        if not in_path.exists():
+            print(f"Error: input not found: {in_path}")
+            sys.exit(1)
+        # Single combined multi-paper file: split into per-paper blocks.
+        blocks = split_combined(in_path.read_text(encoding='utf-8').splitlines())
+        papers = [parse_paper_lines(b) for b in blocks]
+        sources = [p['label'] for p in papers]
+        default_title = in_path.stem
+        print(f"Combined file: split into {len(papers)} papers")
 
     # Warn about papers with no detected answers (helps catch malformed inputs).
-    for f, p in zip(files, papers):
+    for name, p in zip(sources, papers):
         if not p['answers']:
-            print(f"Warning: no answers parsed from {f.name}")
+            print(f"Warning: no answers parsed from {name}")
 
-    title = args.title or in_dir.name
+    title = args.title or default_title
     out_dir = Path(args.output_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
 
